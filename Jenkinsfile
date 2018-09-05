@@ -43,6 +43,13 @@ spec:
     }
   }
   stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+        stash includes: '**', excludes: 'tests/**', name: 'src'
+        stash includes: 'tests/**', name: 'tests'
+      }
+    }
     stage('Build') {
       steps {
         echo 'make package'
