@@ -1,4 +1,7 @@
 pipeline {
+  options {
+    skipDefaultCheckout()
+  }
   agent {
     kubernetes {
       cloud 'kubernetes-cluster'
