@@ -10,21 +10,35 @@ pipeline {
       yaml """
 apiVersion: v1
 kind: Pod
-metadata:
-  labels:
-    some-label: some-label-value
 spec:
+  securityContext:
+    runAsUser: 1000
+    fsGroup: 1000
   containers:
-  - name: maven
-    image: maven:alpine
-    command:
-    - cat
-    tty: true
-  - name: busybox
-    image: busybox
-    command:
-    - cat
-    tty: true
+  - name: go
+    image: golang:1.10.1-stretch
+    stdin: true
+    command: ['cat']
+    resources:
+      limits:
+        cpu: 2000m
+        memory: 2Gi
+      requests:
+        # rely on burst CPU
+        cpu: 10m
+        # but actually need ram to avoid oom killer
+        memory: 1Gi
+  - name: az
+    image: microsoft/azure-cli:2.0.45
+    stdin: true
+    command: ['cat']
+    resources:
+      limits:
+        cpu: 100m
+        memory: 500Mi
+      requests:
+        cpu: 1m
+        memory: 100Mi
 """
     }
   }
@@ -32,11 +46,8 @@ spec:
     stage('Build') {
       steps {
         echo 'make package'
-        container('maven') {
-          sh 'mvn -version'
-        }
-        container('busybox') {
-          sh '/bin/busybox'
+        container('go') {
+          sh 'go version'
         }
       }
     }
