@@ -12,7 +12,7 @@ pipeline {
             }
         }
         stage('Deploy') {
-            when { tag "release-*" }
+            when { tag "*" }
             steps {
                 echo 'make deploy'
             }
